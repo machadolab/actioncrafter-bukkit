@@ -1,4 +1,4 @@
-package com.actioncrafter.runner;
+package com.actioncrafter.core;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,10 +8,10 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-public class EventStreamer extends Thread 
+public class ACEventStreamer extends Thread 
 {
 	
-	List<Event> eventOutputQueue = new ArrayList<Event>();
+	List<ACEvent> eventOutputQueue = new ArrayList<ACEvent>();
 	
     private static final String ACTIONCRAFTER_ENDPOINT = "http://localhost:9292/event";
 	
@@ -23,7 +23,7 @@ public class EventStreamer extends Thread
 		this.start();
 	}
 	
-	public void queueEvent(Event event) 
+	public void queueEvent(ACEvent event) 
 	{
 		System.err.println("QUEUE EVENT: " + event);
 		synchronized (eventOutputQueue)
@@ -39,7 +39,7 @@ public class EventStreamer extends Thread
 	}
 	
 	
-	void uploadEvent(Event event)
+	void uploadEvent(ACEvent event)
 	{
 		System.err.println("SENDING EVENT: " + event);
 

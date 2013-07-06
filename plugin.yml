@@ -2,8 +2,8 @@ name: ActionCrafter
 main: com.actioncrafter.plugin.ActionCraftPlugin
 version: 0.1
 commands:
-   event:
-      description: this is actioncrafter.
-      usage: /actioncrafter <event>
-      permission: actioncrafter.event
+   ac_event:
+      description: Send an event to ActionCrafter
+      usage: /ac_event <event_string>
+      permission: actioncrafter.ac_event
       permission-message: You don't have <permission>   

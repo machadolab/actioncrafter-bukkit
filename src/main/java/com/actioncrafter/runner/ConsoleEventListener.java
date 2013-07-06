@@ -1,11 +1,14 @@
 package com.actioncrafter.runner;
 
-public class EventListener implements ServerConsoleListener 
+import com.actioncrafter.core.ACEvent;
+import com.actioncrafter.core.ACEventStreamer;
+
+public class ConsoleEventListener implements ServerConsoleListener 
 {
 	ServerConsoleController mServerConsole;
-	EventStreamer mEventStreamer;
+	ACEventStreamer mEventStreamer;
 	
-	public EventListener(ServerConsoleController serverConsole)
+	public ConsoleEventListener(ServerConsoleController serverConsole)
 	{
 		mServerConsole = serverConsole;
 	}
@@ -13,7 +16,7 @@ public class EventListener implements ServerConsoleListener
 	
 	public void receivedLine(String line) 
 	{
-		Event event;
+		ACEvent event;
 		
 		if ((event = parseEvent(line)) != null)
 		{
@@ -26,11 +29,11 @@ public class EventListener implements ServerConsoleListener
 		}
 	}
 	
-	Event parseEvent(String line)
+	ACEvent parseEvent(String line)
 	{
-		Event event = null;
+		ACEvent event = null;
 		
-		event = new Event("fake_event");
+		event = new ACEvent("fake_event");
 		event.setParam("fake_param1", "blah");
 		
 		return event;
@@ -44,7 +47,7 @@ public class EventListener implements ServerConsoleListener
 	public void serverStarted()
 	{
 		System.err.println("[eventListener] Server has started");
-		mEventStreamer = new EventStreamer();
+		mEventStreamer = new ACEventStreamer();
 		mEventStreamer.startStreamer();
 	}
 

@@ -7,7 +7,7 @@ import java.io.InputStreamReader;
 public class ActionCrafterRunner implements ServerConsoleListener
 {
 
-	EventListener eventListener;
+	ConsoleEventListener eventListener;
 	
 	ServerConsoleController serverConsole;
 	
@@ -25,7 +25,7 @@ public class ActionCrafterRunner implements ServerConsoleListener
 
 		serverConsole = new ServerConsoleController();
 		
-		eventListener = new EventListener(serverConsole);
+		eventListener = new ConsoleEventListener(serverConsole);
 		
 		serverConsole.addListener(eventListener);
 		serverConsole.addListener(this);

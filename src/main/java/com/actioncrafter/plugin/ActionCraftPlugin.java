@@ -4,28 +4,47 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.actioncrafter.core.ACEvent;
+import com.actioncrafter.core.ACEventStreamer;
+
 public class ActionCraftPlugin extends JavaPlugin 
 {
 
+	ACEventStreamer mEventStreamer;
+
+	
 	@Override
 	public void onEnable()
 	{
 		this.saveDefaultConfig();
-		getLogger().info("ActionCrafter logger enabled");
-		getLogger().info("Key is " + getConfig().getString("api_key"));
+		getLogger().info("Starting EventStreamer");
+		
+		mEventStreamer = new ACEventStreamer();
+		mEventStreamer.startStreamer();
+		
+//		getLogger().info("Key is " + getConfig().getString("api_key"));
+	}
+	
+	@Override
+	public void onDisable()
+	{
+		mEventStreamer.stopStreamer();
 	}
 	
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args)
 	{
 		if(cmd.getName().equalsIgnoreCase("ac_event"))
 		{
+			ACEvent event = ACEvent.build(args[0]);
+			getLogger().fine("Sending ACEvent: " + event);
 			
-			// If the player typed /basic then do the following...
-			getLogger().info("Sending ActionCrafter event");
-			// doSomething
+			mEventStreamer.queueEvent(event);
+			
 			return true;
-		} //If this has happened the function will return true. 
-	        // If this hasn't happened the a value of false will be returned.
+		}
+		
+		getLogger().info("Unhandled command: " + cmd.getName());
+		
 		return false; 
 	}
 

@@ -1,11 +1,11 @@
-package com.actioncrafter.runner;
+package com.actioncrafter.core;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Event 
+public class ACEvent 
 {
 	
 	protected String mName;
@@ -16,7 +16,7 @@ public class Event
 	
 	
 	
-	public Event(String name) {
+	public ACEvent(String name) {
 		mName = name;
 		mParams = new HashMap<String, String>();
 	}
@@ -75,12 +75,12 @@ public class Event
 		return sb.toString();
 	}
 
-	static Event build(String line) {
+	public static ACEvent build(String line) {
 		Matcher m = sEventPattern.matcher(line);
 
 		if (m.matches())
 		{
-			Event e = new Event(m.group(1));
+			ACEvent e = new ACEvent(m.group(1));
 			if (m.groupCount() > 1) {
 				String[] pairs = m.group(2).split("\\|");
 				for (String p : pairs)
