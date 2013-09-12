@@ -11,9 +11,9 @@ import org.apache.http.impl.client.DefaultHttpClient;
 public class ACEventStreamer extends Thread 
 {
 	
-	List<ACEvent> eventOutputQueue = new ArrayList<ACEvent>();
+	private final List<ACEvent> eventOutputQueue = new ArrayList<ACEvent>();
 	
-    private static final String ACTIONCRAFTER_ENDPOINT = "http://localhost:9292/event";
+    private static final String ACTIONCRAFTER_ENDPOINT = "http://machadolab.com:3000/event";
 	
     
 	private volatile boolean streamerRunning = false;
@@ -25,7 +25,7 @@ public class ACEventStreamer extends Thread
 	
 	public void queueEvent(ACEvent event) 
 	{
-		System.err.println("QUEUE EVENT: " + event);
+		System.out.println("QUEUE EVENT: " + event);
 		synchronized (eventOutputQueue)
 		{
 			eventOutputQueue.add(event);
@@ -41,30 +41,30 @@ public class ACEventStreamer extends Thread
 	
 	void uploadEvent(ACEvent event)
 	{
-		System.err.println("SENDING EVENT: " + event);
+		System.out.println("SENDING EVENT: " + event);
 
 		try 
 		{
-		    DefaultHttpClient httpclient = new DefaultHttpClient();
+		    DefaultHttpClient httpClient = new DefaultHttpClient();
 
 			String url = ACTIONCRAFTER_ENDPOINT + "?" + event.toUrlString();
 			HttpGet httpget = new HttpGet(url);
-			HttpResponse response = httpclient.execute(httpget);
+			HttpResponse response = httpClient.execute(httpget);
 
 			HttpEntity entity = response.getEntity();
 
-			System.err.println("Http response status - " + response.getStatusLine());
+			System.out.println("Http response status - " + response.getStatusLine());
 			if (entity != null)
 			{
-				System.err.println("Http response body: " + entity.getContent());
+				System.out.println("Http response body: " + entity.getContent());
 			}
 
-			httpclient.getConnectionManager().shutdown();
+			httpClient.getConnectionManager().shutdown();
 
 		}
 		catch (Exception e) 
 		{
-			System.err.println("Exception during http get: " + e.getMessage());
+			System.out.println("Exception during http get: " + e.getMessage());
 			e.printStackTrace();
 		}
 	}
@@ -74,7 +74,7 @@ public class ACEventStreamer extends Thread
 	{
 		streamerRunning = true;
 		
-		while(streamerRunning == true)
+		while(streamerRunning)
 		{
 			try
 			{
@@ -92,11 +92,11 @@ public class ACEventStreamer extends Thread
 			}
 			catch (InterruptedException e)
 			{
-				System.err.println("EventStreamer interrupted");
+				System.out.println("EventStreamer interrupted");
 			}
 			catch (Exception e)
 			{
-				System.err.println("Error in streamer loop - " + e);
+				System.out.println("Error in streamer loop - " + e);
 				e.printStackTrace();
 				streamerRunning = false;
 			}

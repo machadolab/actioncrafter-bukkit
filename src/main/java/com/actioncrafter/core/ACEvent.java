@@ -1,5 +1,7 @@
 package com.actioncrafter.core;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -53,26 +55,34 @@ public class ACEvent
 	
 	public String toUrlString()
 	{
-		StringBuilder sb = new StringBuilder();
-		sb.append("name=");
-		sb.append(mName);
-		if (mParams.size() > 0)
-		{
-			sb.append("&");
-		}
-		int keysLeft = mParams.size();
-		for (String param : mParams.keySet())
-		{
-			sb.append(param);
-			sb.append("=");
-			sb.append(mParams.get(param));
-			if (keysLeft > 1)
+		try {
+			
+			StringBuilder sb = new StringBuilder();
+			sb.append("name=");
+			sb.append(URLEncoder.encode(mName, "UTF-8"));
+			if (mParams.size() > 0)
 			{
 				sb.append("&");
 			}
-			keysLeft--;
+			int keysLeft = mParams.size();
+			for (String param : mParams.keySet())
+			{
+				sb.append(URLEncoder.encode(param, "UTF-8"));
+				sb.append("=");
+				sb.append(URLEncoder.encode(mParams.get(param), "UTF-8"));
+				if (keysLeft > 1)
+				{
+					sb.append("&");
+				}
+				keysLeft--;
+			}
+			return sb.toString();
 		}
-		return sb.toString();
+		catch (UnsupportedEncodingException e) 
+		{
+			System.err.println("Error encoding query: " + e.getMessage());
+			return "";
+		}
 	}
 
 	public static ACEvent build(String line) {
@@ -82,13 +92,17 @@ public class ACEvent
 		{
 			ACEvent e = new ACEvent(m.group(1));
 			if (m.groupCount() > 1) {
-				String[] pairs = m.group(2).split("\\|");
-				for (String p : pairs)
+				String args = m.group(2);
+				if (args != null)
 				{
-					String[] nv = p.split("=");
-					if (nv != null && nv.length == 2)
+					String[] pairs = m.group(2).split("\\|");
+					for (String p : pairs)
 					{
-						e.setParam(nv[0].trim(), nv[1].trim());
+						String[] nv = p.split("=");
+						if (nv != null && nv.length == 2)
+						{
+							e.setParam(nv[0].trim(), nv[1].trim());
+						}
 					}
 				}
 			}
@@ -96,7 +110,7 @@ public class ACEvent
 		} 
 		else
 		{
-			return null;
+			return new ACEvent(line);
 		}
 	}
 }

@@ -6,8 +6,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.actioncrafter.core.ACEvent;
 import com.actioncrafter.core.ACEventStreamer;
+import com.google.common.base.Joiner;
 
-public class ActionCraftPlugin extends JavaPlugin 
+public class ActionCrafterPlugin extends JavaPlugin 
 {
 
 	ACEventStreamer mEventStreamer;
@@ -35,10 +36,26 @@ public class ActionCraftPlugin extends JavaPlugin
 	{
 		if(cmd.getName().equalsIgnoreCase("ac_event"))
 		{
-			ACEvent event = ACEvent.build(args[0]);
-			getLogger().fine("Sending ACEvent: " + event);
+			if (args.length <= 0)
+			{
+				getLogger().info("Invalid usage. Event format is: <event_name> [<argument>=<value>|<argument>=<value>|...]");
+				return false;
+			}
 			
-			mEventStreamer.queueEvent(event);
+			String eventStr = Joiner.on(" ").join(args);
+				
+			getLogger().info("Event string is " + eventStr);
+			try 
+			{
+				ACEvent event = ACEvent.build(eventStr);
+				getLogger().info("Sending ACEvent: " + event);
+				
+				mEventStreamer.queueEvent(event);				
+			}
+			catch (Exception e)
+			{
+				getLogger().warning("Exception while queueing event: " + e.getMessage());
+			}
 			
 			return true;
 		}
