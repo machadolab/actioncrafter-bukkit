@@ -8,13 +8,12 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-public class ACEventStreamer extends Thread 
+public class ACEventUploader extends Thread
 {
 	
 	private final List<ACEvent> eventOutputQueue = new ArrayList<ACEvent>();
 	
-    private static final String ACTIONCRAFTER_ENDPOINT = "http://machadolab.com:3000/event";
-	
+
     
 	private volatile boolean streamerRunning = false;
 	
@@ -47,7 +46,7 @@ public class ACEventStreamer extends Thread
 		{
 		    DefaultHttpClient httpClient = new DefaultHttpClient();
 
-			String url = ACTIONCRAFTER_ENDPOINT + "?" + event.toUrlString();
+			String url = ACConfig.ACTIONCRAFTER_ENDPOINT + "/queue/mc_out/event?key="+ACConfig.ACTIONCRAFTER_KEY+"&"+event.toUrlString();
 			HttpGet httpget = new HttpGet(url);
 			HttpResponse response = httpClient.execute(httpget);
 

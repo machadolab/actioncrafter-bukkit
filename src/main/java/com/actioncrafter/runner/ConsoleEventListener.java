@@ -1,12 +1,12 @@
 package com.actioncrafter.runner;
 
 import com.actioncrafter.core.ACEvent;
-import com.actioncrafter.core.ACEventStreamer;
+import com.actioncrafter.core.ACEventUploader;
 
 public class ConsoleEventListener implements ServerConsoleListener 
 {
 	ServerConsoleController mServerConsole;
-	ACEventStreamer mEventStreamer;
+	ACEventUploader mEventStreamer;
 	
 	public ConsoleEventListener(ServerConsoleController serverConsole)
 	{
@@ -47,7 +47,7 @@ public class ConsoleEventListener implements ServerConsoleListener
 	public void serverStarted()
 	{
 		System.err.println("[eventListener] Server has started");
-		mEventStreamer = new ACEventStreamer();
+		mEventStreamer = new ACEventUploader();
 		mEventStreamer.startStreamer();
 	}
 

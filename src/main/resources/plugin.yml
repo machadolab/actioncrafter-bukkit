@@ -1,6 +1,6 @@
 name: ActionCrafter
 main: com.actioncrafter.plugin.ActionCrafterPlugin
-version: 0.1
+version: 0.2
 commands:
    ac_event:
       description: Send an event to ActionCrafter

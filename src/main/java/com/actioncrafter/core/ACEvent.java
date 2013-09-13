@@ -1,9 +1,15 @@
 package com.actioncrafter.core;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+import java.io.IOException;
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -11,18 +17,44 @@ public class ACEvent
 {
 	
 	protected String mName;
+
+    protected Date mDate;
 	
 	protected Map<String, String> mParams;
 	
 	private static Pattern sEventPattern = Pattern.compile("(.*?)(?:\\s+(.*))?");
 	
 	
-	
+	public ACEvent()
+    {
+        this(null);
+    }
+
 	public ACEvent(String name) {
 		mName = name;
 		mParams = new HashMap<String, String>();
 	}
-	
+
+    public void setName(String name)
+    {
+        mName = name;
+    }
+
+    public String getName()
+    {
+        return mName;
+    }
+
+    public void setDate(Date date)
+    {
+        mDate = date;
+    }
+
+    public Date getDate()
+    {
+        return mDate;
+    }
+
 	public void setParam(String param, String value)
 	{
 		mParams.put(param, value);
@@ -32,6 +64,11 @@ public class ACEvent
 	{
 		return mParams.get(param);
 	}
+
+    public Set<String> getParamKeys()
+    {
+        return mParams.keySet();
+    }
 	
 	public String toString()
 	{
@@ -113,4 +150,66 @@ public class ACEvent
 			return new ACEvent(line);
 		}
 	}
+
+
+    public static List<ACEvent> parseJson(Reader json)
+    {
+        List<ACEvent> events = new ArrayList<ACEvent>();
+
+
+        JSONParser parser = new JSONParser();
+
+        try
+        {
+            JSONObject o = (JSONObject)parser.parse(json);
+            Boolean res = (Boolean)o.get("success");
+            if (res)
+            {
+                JSONArray items = (JSONArray)o.get("items");
+                System.out.println("Got " + items.size() + " events from server");
+                for (int i = 0; i < items.size(); i++)
+                {
+
+                    ACEvent e = new ACEvent();
+
+                    JSONObject item = (JSONObject)items.get(i);
+                    for (Object k : item.keySet())
+                    {
+                        if (k.equals("name"))
+                        {
+                            e.setName((String)item.get(k));
+                        }
+                        else if (k.equals("_date"))
+                        {
+                            e.setDate(new Date((Long)item.get(k)*1000));
+                        }
+                        else
+                        {
+                            e.setParam((String)k, (String)item.get(k));
+                        }
+                        System.out.println("In item " + i + " - Found key " + k + " with value " + item.get(k));
+                    }
+
+                    events.add(e);
+                }
+            }
+            else
+            {
+                System.out.println("Error in response.");
+            }
+
+        }
+        catch (IOException e)
+        {
+            System.out.println(e);
+        }
+        catch(ParseException pe)
+        {
+            System.out.println("position: " + pe.getPosition());
+            System.out.println(pe);
+        }
+
+
+        return events;
+    }
 }
