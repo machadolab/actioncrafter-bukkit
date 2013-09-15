@@ -1,13 +1,10 @@
 package com.actioncrafter.plugin;
 
-import com.actioncrafter.core.ACEventPoller;
-import com.actioncrafter.core.ACEventReceiver;
-import com.actioncrafter.core.ACEventUploader;
+import com.actioncrafter.core.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.actioncrafter.core.ACEvent;
 import com.google.common.base.Joiner;
 
 import java.util.List;
@@ -44,11 +41,11 @@ public class ActionCrafterPlugin extends JavaPlugin
 	
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args)
 	{
-		if(cmd.getName().equalsIgnoreCase("ac_event"))
+		if(cmd.getName().equalsIgnoreCase("action"))
 		{
 			if (args.length <= 0)
 			{
-				getLogger().info("Invalid usage. Event format is: <event_name> [<argument>=<value>|<argument>=<value>|...]");
+				getLogger().info("Invalid usage. Action format is: <action_name> [<argument>=<value>|<argument>=<value>|...]");
 				return false;
 			}
 			
@@ -57,18 +54,11 @@ public class ActionCrafterPlugin extends JavaPlugin
 			getLogger().info("Event string is " + eventStr);
 			try 
 			{
-
-                if (eventStr.equals("woot"))
-                {
-                    getServer().dispatchCommand(sender, "rsc testme");
-                }
-                else
-                {
 				ACEvent event = ACEvent.build(eventStr);
+                event.setSource(ACConfig.ACTINCRAFTER_EVENT_SOURCE);
 				getLogger().info("Sending ACEvent: " + event);
 				
 				mEventStreamer.queueEvent(event);
-                }
 			}
 			catch (Exception e)
 			{

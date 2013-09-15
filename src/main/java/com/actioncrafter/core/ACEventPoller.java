@@ -47,11 +47,13 @@ public class ACEventPoller
         public void run()
         {
             List<ACEvent> events = getEvents();
-            for (ACEventReceiver receiver : receivers)
+            if (events != null)
             {
-                receiver.handleEvents(events);
+                for (ACEventReceiver receiver : receivers)
+                {
+                    receiver.handleEvents(events);
+                }
             }
-
         }
 
         public List<ACEvent> getEvents()
@@ -61,7 +63,8 @@ public class ACEventPoller
 
             try
             {
-                String url = ACConfig.ACTIONCRAFTER_ENDPOINT + "/queue/mc_in/all?key="+ACConfig.ACTIONCRAFTER_KEY+"&save=0";
+                String url = ACConfig.ACTIONCRAFTER_ENDPOINT + "/queue/" +
+                    ACConfig.ACTIONCRAFTER_DEFAULT_QUEUE + "/all?key="+ACConfig.ACTIONCRAFTER_KEY+"&save=0";
 
                 System.out.println("Polling actioncrafter server at " + url);
 

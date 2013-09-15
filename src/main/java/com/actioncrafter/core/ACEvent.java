@@ -19,6 +19,8 @@ public class ACEvent
 	protected String mName;
 
     protected Date mDate;
+
+    protected String mSource;
 	
 	protected Map<String, String> mParams;
 	
@@ -43,6 +45,16 @@ public class ACEvent
     public String getName()
     {
         return mName;
+    }
+
+    public void setSource(String source)
+    {
+        mSource = source;
+    }
+
+    public String getSource()
+    {
+        return mSource;
     }
 
     public void setDate(Date date)
@@ -87,6 +99,11 @@ public class ACEvent
 			}
 			keysLeft--;
 		}
+        if (mSource != null)
+        {
+            sb.append("|source=");
+            sb.append(mSource);
+        }
 		return sb.toString();
 	}
 	
@@ -113,6 +130,11 @@ public class ACEvent
 				}
 				keysLeft--;
 			}
+            if (mSource != null)
+            {
+                sb.append("&source=");
+                sb.append(URLEncoder.encode(mSource,"UTF-8"));
+            }
 			return sb.toString();
 		}
 		catch (UnsupportedEncodingException e) 
