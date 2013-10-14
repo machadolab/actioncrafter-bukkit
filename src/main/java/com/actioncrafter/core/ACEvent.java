@@ -5,8 +5,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import java.io.IOException;
-import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
@@ -20,7 +18,7 @@ public class ACEvent
 
     protected Date mDate;
 
-    protected String mSource;
+    protected String mChannel;
 	
 	protected Map<String, String> mParams;
 	
@@ -47,14 +45,14 @@ public class ACEvent
         return mName;
     }
 
-    public void setSource(String source)
+    public void setChannel(String channel)
     {
-        mSource = source;
+        mChannel = channel;
     }
 
-    public String getSource()
+    public String getChannel()
     {
-        return mSource;
+        return mChannel;
     }
 
     public void setDate(Date date)
@@ -99,25 +97,24 @@ public class ACEvent
 			}
 			keysLeft--;
 		}
-        if (mSource != null)
-        {
-            sb.append("|source=");
-            sb.append(mSource);
-        }
 		return sb.toString();
 	}
 	
 	public String toUrlString()
 	{
-		try {
-			
+		try
+        {
 			StringBuilder sb = new StringBuilder();
-			sb.append("name=");
-			sb.append(URLEncoder.encode(mName, "UTF-8"));
-			if (mParams.size() > 0)
-			{
-				sb.append("&");
-			}
+            if (mName != null)
+            {
+                sb.append("name=");
+                sb.append(URLEncoder.encode(mName, "UTF-8"));
+                if (mParams.size() > 0)
+                {
+                    sb.append("&");
+                }
+            }
+
 			int keysLeft = mParams.size();
 			for (String param : mParams.keySet())
 			{
@@ -130,11 +127,6 @@ public class ACEvent
 				}
 				keysLeft--;
 			}
-            if (mSource != null)
-            {
-                sb.append("&source=");
-                sb.append(URLEncoder.encode(mSource,"UTF-8"));
-            }
 			return sb.toString();
 		}
 		catch (UnsupportedEncodingException e) 
@@ -144,13 +136,15 @@ public class ACEvent
 		}
 	}
 
-	public static ACEvent build(String line) {
+	public static ACEvent build(String line)
+    {
 		Matcher m = sEventPattern.matcher(line);
 
 		if (m.matches())
 		{
 			ACEvent e = new ACEvent(m.group(1));
-			if (m.groupCount() > 1) {
+			if (m.groupCount() > 1)
+            {
 				String args = m.group(2);
 				if (args != null)
 				{
@@ -174,7 +168,7 @@ public class ACEvent
 	}
 
 
-    public static List<ACEvent> parseJson(Reader json)
+    public static List<ACEvent> parseListJson(String json)
     {
         List<ACEvent> events = new ArrayList<ACEvent>();
 
@@ -221,10 +215,6 @@ public class ACEvent
             }
 
         }
-        catch (IOException e)
-        {
-            System.out.println(e);
-        }
         catch(ParseException pe)
         {
             System.out.println("position: " + pe.getPosition());
@@ -233,5 +223,44 @@ public class ACEvent
 
 
         return events;
+    }
+
+
+    public static ACEvent parseJson(String json)
+    {
+        JSONParser parser = new JSONParser();
+
+        try
+        {
+            ACEvent e = new ACEvent();
+
+            JSONObject item = (JSONObject)parser.parse(json);
+            for (Object k : item.keySet())
+            {
+                if (k.equals("name"))
+                {
+                    e.setName((String)item.get(k));
+                }
+                else if (k.equals("_date"))
+                {
+                    e.setDate(new Date((Long)item.get(k)*1000));
+                }
+                else
+                {
+                    e.setParam((String)k, (String)item.get(k));
+                }
+            }
+
+            return e;
+
+        }
+        catch(ParseException pe)
+        {
+            System.out.println("position: " + pe.getPosition());
+            System.out.println(pe);
+        }
+
+
+        return null;
     }
 }

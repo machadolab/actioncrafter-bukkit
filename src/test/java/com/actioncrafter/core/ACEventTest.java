@@ -37,22 +37,16 @@ public class ACEventTest {
 		assertEquals("value1 with spaces", e.getParam("param1"));
 	}
 
-
-
     @Test
     public void testParseJSONResultIntoList()
     {
 
-        String json = "{\"success\":true,\"items\":[{\"name\":\"bob\",\"arg1\":\"cool3\",\"key\":\"121212\",\"queue\":\"test1\",\"_date\":1379045263},{\"name\":\"bob\",\"arg1\":\"cool3\",\"key\":\"121212\",\"queue\":\"test1\",\"_date\":1379045270},{\"name\":\"bob\",\"arg1\":\"cool3\",\"key\":\"121212\",\"queue\":\"test1\",\"_date\":1379045271}],\"item_count\":3}";
+        String json = "{\"name\":\"bob\",\"arg1\":\"cool3\",\"_date\":1379045263}";
 
-        List<ACEvent> events = ACEvent.parseJson(new StringReader(json));
+        ACEvent event = ACEvent.parseJson(json);
 
-        assertEquals(3, events.size());
-
-        ACEvent e = events.get(0);
-        assertEquals("bob", e.getName());
-        assertEquals("cool3", e.getParam("arg1"));
-
+        assertEquals("bob", event.getName());
+        assertEquals("cool3", event.getParam("arg1"));
     }
 
 }

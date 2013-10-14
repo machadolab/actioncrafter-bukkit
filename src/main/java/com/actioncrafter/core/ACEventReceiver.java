@@ -5,6 +5,6 @@ import java.util.List;
 public interface ACEventReceiver
 {
 
-    public void handleEvents(List<ACEvent> events);
+    public void handleEvent(ACEvent event);
 
 }

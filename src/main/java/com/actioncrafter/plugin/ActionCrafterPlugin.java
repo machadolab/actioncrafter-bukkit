@@ -1,42 +1,55 @@
 package com.actioncrafter.plugin;
 
 import com.actioncrafter.core.*;
+import java.net.URI;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.google.common.base.Joiner;
-
+import java.net.URISyntaxException;
 import java.util.List;
 
 public class ActionCrafterPlugin extends JavaPlugin 
 {
 
-	ACEventUploader mEventStreamer;
-    ACEventPoller mEventPoller;
-
+    ACWebsocketConnector mACConnector;
 	
 	@Override
 	public void onEnable()
 	{
 		this.saveDefaultConfig();
-		getLogger().info("Starting EventStreamer");
-		
-		mEventStreamer = new ACEventUploader();
-		mEventStreamer.startStreamer();
 
-        getLogger().info("Starting EventPoller");
-        mEventPoller = new ACEventPoller();
-        mEventPoller.addListener(new ActionCrafterInputEventReceiver());
-        mEventPoller.startPoller();
-		
-//		getLogger().info("Key is " + getConfig().getString("api_key"));
+		getLogger().info("Starting ACWebsocketConnector");
+        try
+        {
+
+            String acUrl = getConfig().getString("actioncrafter_url");
+            String acKey = getConfig().getString("api_key");
+            String acChannels = getConfig().getString("subscribe_channels");
+
+            URI acUri = new URI(acUrl+"?key="+acKey);
+            mACConnector = new ACWebsocketConnector(acUri, getLogger());
+
+            mACConnector.addListener(new ActionCrafterInputEventReceiver());
+
+            mACConnector.startConnection();
+
+            mACConnector.subscribeChannel(acChannels);
+
+        }
+        catch (URISyntaxException e)
+        {
+            getLogger().warning("Error while initializing actioncrafter websocket: " + e.toString());
+            e.printStackTrace();
+        }
+
 	}
 	
 	@Override
 	public void onDisable()
 	{
-		mEventStreamer.stopStreamer();
+        mACConnector.closeConnection();
 	}
 	
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args)
@@ -45,20 +58,29 @@ public class ActionCrafterPlugin extends JavaPlugin
 		{
 			if (args.length <= 0)
 			{
-				getLogger().info("Invalid usage. Action format is: <action_name> [<argument>=<value>|<argument>=<value>|...]");
+				getLogger().info("Invalid usage. Action format is: <channel> <action_name> [<argument>=<value>|<argument>=<value>|...]");
 				return false;
 			}
-			
-			String eventStr = Joiner.on(" ").join(args);
+
+            String channel = args[0];
+            StringBuilder sb = new StringBuilder();
+            for (int i = 1; i < args.length; i++)
+            {
+                sb.append(args[i]);
+                if (i < args.length)
+                {
+                    sb.append(" ");
+                }
+            }
+
+			String eventStr = sb.toString();
 				
 			getLogger().info("Event string is " + eventStr);
 			try 
 			{
 				ACEvent event = ACEvent.build(eventStr);
-                event.setSource(ACConfig.ACTINCRAFTER_EVENT_SOURCE);
-				getLogger().info("Sending ACEvent: " + event);
-				
-				mEventStreamer.queueEvent(event);
+                event.setChannel(channel);
+                mACConnector.sendEvent(event);
 			}
 			catch (Exception e)
 			{
@@ -77,20 +99,15 @@ public class ActionCrafterPlugin extends JavaPlugin
     {
 
         @Override
-        public void handleEvents(List<ACEvent> events)
+        public void handleEvent(ACEvent event)
         {
-            for (ACEvent event : events)
-            {
-                String command = eventToCommand(event);
-                getLogger().info("Executing command " + command);
-                getServer().dispatchCommand(getServer().getConsoleSender(), command);
-            }
-
+            String command = eventToCommand(event);
+            getLogger().info("Executing command " + command);
+            getServer().dispatchCommand(getServer().getConsoleSender(), command);
         }
 
         public String eventToCommand(ACEvent event)
         {
-
             String command = event.getName();
             String args = event.getParam("args");
             if (args != null)

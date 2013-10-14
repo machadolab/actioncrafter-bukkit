@@ -1,9 +1,9 @@
 name: ActionCrafter
 main: com.actioncrafter.plugin.ActionCrafterPlugin
-version: 0.3
+version: 0.3.1
 commands:
    action:
-      description: Send an action to ActionCrafter
-      usage: /action <action_name> [<argument>=<value>|<argument>=<value>|...]
+      description: Send an action to an ActionCrafter channel
+      usage: /action <channel> <action_name> [<argument>=<value>|<argument>=<value>|...]
       permission: actioncrafter.action
       permission-message: You don't have <permission>   
