@@ -35,7 +35,7 @@ public class ACPusherConnector implements ConnectionEventListener, SubscriptionE
 
         PusherOptions options = new PusherOptions();
         options.setAuthorizer(authorizer);
-//        options.setEncrypted(false);
+        options.setEncrypted(false);
 
         mPusher = new Pusher(pusherKey, options);
 
