@@ -2,6 +2,7 @@ package com.actioncrafter.core;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
@@ -45,16 +46,6 @@ public class ACEvent
         return mName;
     }
 
-    public void setChannel(String channel)
-    {
-        mChannel = channel;
-    }
-
-    public String getChannel()
-    {
-        return mChannel;
-    }
-
     public void setDate(Date date)
     {
         mDate = date;
@@ -78,6 +69,11 @@ public class ACEvent
     public Set<String> getParamKeys()
     {
         return mParams.keySet();
+    }
+
+    public String paramsAsJson()
+    {
+        return JSONValue.toJSONString(mParams);
     }
 	
 	public String toString()

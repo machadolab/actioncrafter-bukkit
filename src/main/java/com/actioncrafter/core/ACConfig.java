@@ -12,4 +12,8 @@ public class ACConfig
     public static final String ACTINCRAFTER_EVENT_SOURCE = "mc";
 
     public static final String ACTIONCRAFTER_DEFAULT_QUEUE = "default";
+
+
+    public static final String ACTIONCRAFTER_PUSHER_KEY = "121212";
+    public static final String ACTIONCRAFTER_PUSHER_CHANNEL = "actioncrafter";
 }

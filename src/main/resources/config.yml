@@ -1,3 +1,3 @@
-actioncrafter_url: "ws://machadolab.com:8081"
-subscribe_channels: "minecraft"
-api_key: "<not set>"
+pusher_apikey: "<not set>"
+pusher_secret: "<not set>"
+pusher_channel: "actioncrafter"
